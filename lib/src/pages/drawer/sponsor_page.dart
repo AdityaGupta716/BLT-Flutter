@@ -1,4 +1,4 @@
-import 'package:blt/src/pages/drawer/drawer_imports.dart';,,
+import 'package:blt/src/pages/drawer/drawer_imports.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const String kBltSupportUrl = 'https://owaspblt.org/bounties/';
