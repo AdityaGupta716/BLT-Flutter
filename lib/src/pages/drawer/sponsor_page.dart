@@ -33,25 +33,25 @@ class _SponsorPageState extends State<SponsorPage>
     {
       "title": "Ant Tier",
       "svg": "assets/ant.svg",
-      "subtitle": "Join the Colony - \\$10",
+      "subtitle": "Join the Colony - \$10",
       "option": 0,
     },
     {
       "title": "Flea Tier",
       "svg": "assets/flea.svg",
-      "subtitle": "Leap into Action - \\$50",
+      "subtitle": "Leap into Action - \$50",
       "option": 2,
     },
     {
       "title": "Scorpion Tier",
       "svg": "assets/scorpion.svg",
-      "subtitle": "Strike with Power - \\$100",
+      "subtitle": "Strike with Power - \$100",
       "option": 3,
     },
     {
       "title": "Wasp Tier",
       "svg": "assets/wasp.svg",
-      "subtitle": "Rule the Hive - \\$500",
+      "subtitle": "Rule the Hive - \$500",
       "option": 4,
     }
   ];
