@@ -18,9 +18,9 @@ const String kNoTierSelectedError =
 const String kUrlLaunchError =
     "Could not open the sponsorship page. Please try again later.";
 
-/// App-wide color constants for consistent theming
-class AppColors {
-  AppColors._();
+/// Color constants specific to the sponsor page
+class SponsorColors {
+  SponsorColors._();
 
   // Primary brand color
   static const Color primaryRed = Color(0xFFDC4654);
@@ -197,11 +197,11 @@ class _SponsorPageState extends State<SponsorPage> {
       SnackBar(
         content: Text(
           message,
-          style: const TextStyle(color: AppColors.textWhite),
+          style: const TextStyle(color: SponsorColors.textWhite),
         ),
         backgroundColor: isDarkMode
-            ? AppColors.darkAccent
-            : AppColors.primaryRed,
+            ? SponsorColors.darkAccent
+            : SponsorColors.primaryRed,
       ),
     );
   }
@@ -212,7 +212,7 @@ class _SponsorPageState extends State<SponsorPage> {
 
     return Scaffold(
       backgroundColor: isDarkMode
-          ? AppColors.darkBackground
+          ? SponsorColors.darkBackground
           : Theme.of(context).canvasColor,
       appBar: _buildAppBar(isDarkMode),
       body: _buildBody(context, isDarkMode),
@@ -223,19 +223,19 @@ class _SponsorPageState extends State<SponsorPage> {
   PreferredSizeWidget _buildAppBar(bool isDarkMode) {
     return AppBar(
       backgroundColor: isDarkMode
-          ? AppColors.darkPrimary
-          : AppColors.primaryRed,
+          ? SponsorColors.darkPrimary
+          : SponsorColors.primaryRed,
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new_rounded,
-          color: AppColors.textWhite,
+          color: SponsorColors.textWhite,
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: const Text(
         "Sponsor BLT",
         style: TextStyle(
-          color: AppColors.textWhite,
+          color: SponsorColors.textWhite,
           fontSize: 20,
         ),
       ),
@@ -271,7 +271,7 @@ class _SponsorPageState extends State<SponsorPage> {
         "Sponsor BLT",
         style: GoogleFonts.ubuntu(
           textStyle: const TextStyle(
-            color: AppColors.textGray,
+            color: SponsorColors.textGray,
             fontSize: 25,
             fontWeight: FontWeight.w500,
           ),
@@ -290,7 +290,7 @@ class _SponsorPageState extends State<SponsorPage> {
         "to develop and share cutting-edge solutions with the world.",
         style: GoogleFonts.aBeeZee(
           textStyle: const TextStyle(
-            color: AppColors.textGray,
+            color: SponsorColors.textGray,
             height: 1.5,
           ),
         ),
@@ -332,7 +332,7 @@ class _SponsorPageState extends State<SponsorPage> {
             ),
           ),
           backgroundColor: WidgetStateProperty.all(
-            isDarkMode ? AppColors.darkAccent : AppColors.primaryRed,
+            isDarkMode ? SponsorColors.darkAccent : SponsorColors.primaryRed,
           ),
           padding: WidgetStateProperty.all(
             const EdgeInsets.all(16.0),
@@ -343,7 +343,7 @@ class _SponsorPageState extends State<SponsorPage> {
           children: [
             const Icon(
               Icons.volunteer_activism,
-              color: AppColors.textWhite,
+              color: SponsorColors.textWhite,
               size: 28,
             ),
             const SizedBox(width: 8),
@@ -351,7 +351,7 @@ class _SponsorPageState extends State<SponsorPage> {
               "Sponsor",
               style: GoogleFonts.ubuntu(
                 textStyle: const TextStyle(
-                  color: AppColors.textWhite,
+                  color: SponsorColors.textWhite,
                   fontSize: 22,
                 ),
               ),
@@ -387,7 +387,7 @@ class UnselectedSponsorTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           width: 1.5,
-          color: isDarkMode ? AppColors.darkBorder : AppColors.primaryRed,
+          color: isDarkMode ? SponsorColors.darkBorder : SponsorColors.primaryRed,
         ),
       ),
       child: Padding(
@@ -414,7 +414,7 @@ class UnselectedSponsorTile extends StatelessWidget {
           tier.svgAssetPath,
           colorFilter: isDarkMode
               ? const ColorFilter.mode(
-                  AppColors.iconLightGray,
+                  SponsorColors.iconLightGray,
                   BlendMode.srcIn,
                 )
               : null,
@@ -434,8 +434,8 @@ class UnselectedSponsorTile extends StatelessWidget {
             style: GoogleFonts.ubuntu(
               textStyle: TextStyle(
                 color: isDarkMode
-                    ? AppColors.textLightGray
-                    : AppColors.textDarkGray,
+                    ? SponsorColors.textLightGray
+                    : SponsorColors.textDarkGray,
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
               ),
@@ -446,8 +446,8 @@ class UnselectedSponsorTile extends StatelessWidget {
             style: GoogleFonts.ubuntu(
               textStyle: TextStyle(
                 color: isDarkMode
-                    ? AppColors.textMediumGray
-                    : AppColors.textLightGray,
+                    ? SponsorColors.textMediumGray
+                    : SponsorColors.textLightGray,
                 fontSize: 16,
               ),
             ),
@@ -475,7 +475,7 @@ class SelectedSponsorTile extends StatelessWidget {
     return Container(
       width: size.width,
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkPrimary : AppColors.primaryRed,
+        color: isDarkMode ? SponsorColors.darkPrimary : SponsorColors.primaryRed,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
@@ -483,13 +483,9 @@ class SelectedSponsorTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                _buildTierIcon(size),
-                const SizedBox(width: 10),
-                _buildTierInfo(),
-              ],
-            ),
+            _buildTierIcon(size),
+            const SizedBox(width: 10),
+            Expanded(child: _buildTierInfo()),
             _buildCheckmark(isDarkMode),
           ],
         ),
@@ -507,7 +503,7 @@ class SelectedSponsorTile extends StatelessWidget {
         child: SvgPicture.asset(
           tier.svgAssetPath,
           colorFilter: const ColorFilter.mode(
-            AppColors.textWhite,
+            SponsorColors.textWhite,
             BlendMode.srcIn,
           ),
         ),
@@ -524,7 +520,7 @@ class SelectedSponsorTile extends StatelessWidget {
           tier.title,
           style: GoogleFonts.ubuntu(
             textStyle: const TextStyle(
-              color: AppColors.textWhite,
+              color: SponsorColors.textWhite,
               fontSize: 22,
               fontWeight: FontWeight.w500,
             ),
@@ -534,7 +530,7 @@ class SelectedSponsorTile extends StatelessWidget {
           tier.fullSubtitle,
           style: GoogleFonts.ubuntu(
             textStyle: const TextStyle(
-              color: AppColors.textOffWhite,
+              color: SponsorColors.textOffWhite,
               fontSize: 16,
             ),
           ),
@@ -547,7 +543,7 @@ class SelectedSponsorTile extends StatelessWidget {
   Widget _buildCheckmark(bool isDarkMode) {
     return Icon(
       Icons.verified,
-      color: isDarkMode ? AppColors.textLightGray : AppColors.textWhite,
+      color: isDarkMode ? SponsorColors.textLightGray : SponsorColors.textWhite,
       size: 30,
     );
   }
