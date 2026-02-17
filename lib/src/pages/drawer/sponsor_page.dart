@@ -3,9 +3,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 const String kBltSupportUrl = 'https://owaspblt.org/bounties/';
 
-Future<void> openBltSupport() async {
-  final uri = Uri.parse(kBltSupportUrl);
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
+Future<bool> openBltSupport() async {
+  try {
+    final uri = Uri.parse(kBltSupportUrl);
+    final ok = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    return ok;
+  } catch (_) {
+    return false;
+  }
 }
 
 class SponsorPage extends StatefulWidget {
@@ -184,7 +192,7 @@ class _SponsorPageState extends State<SponsorPage>
                         : const Color(0xFFDC4654),
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (selected == -1) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -198,7 +206,20 @@ class _SponsorPageState extends State<SponsorPage>
                       ),
                     );
                   } else {
-                    openBltSupport();
+                    final ok = await openBltSupport();
+                    if (!ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            "Could not open the sponsorship page. Please try again later.",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: isDarkMode
+                              ? const Color.fromRGBO(126, 33, 58, 1)
+                              : const Color(0xFFDC4654),
+                        ),
+                      );
+                    }
                   }
                 },
               ),
