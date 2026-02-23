@@ -1,4 +1,4 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:blt/l10n/app_localizations.dart';
 import 'package:blt/src/pages/drawer/drawer_imports.dart';
 
 class ShowBugHunts extends ConsumerStatefulWidget {

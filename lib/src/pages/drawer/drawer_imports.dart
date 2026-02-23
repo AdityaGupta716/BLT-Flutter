@@ -14,7 +14,7 @@ export '../../constants/socialurls_constants.dart';
 export 'package:blt/src/pages/drawer/web_view.dart';
 export 'package:flutter/material.dart';
 export 'package:webview_flutter/webview_flutter.dart';
-export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+export 'package:blt/l10n/app_localizations.dart';
 export 'package:blt/src/models/bug_hunt_model.dart';
 export 'package:blt/src/providers/bug_hunt_provider.dart';
 export 'package:blt/src/components/bug_hunt_list_tile.dart';
