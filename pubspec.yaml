@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_markdown: ^0.7.1
-  google_fonts: ">=3.0.1 <5.0.0"
+  google_fonts: ^6.1.0
   http: ^1.1.0
   image_picker: ^1.1.1
   receive_sharing_intent:
