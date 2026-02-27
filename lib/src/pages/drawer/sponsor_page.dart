@@ -24,18 +24,21 @@ class SponsorColors {
 
   // Primary brand color
   static const Color primaryRed = Color(0xFFDC4654);
+  static const Color primaryRedLight = Color(0xFFE8707C);
+  static const Color primaryRedDark = Color(0xFFC23545);
 
   // Dark theme colors
   static const Color darkBackground = Color.fromRGBO(34, 22, 23, 1);
   static const Color darkPrimary = Color.fromRGBO(58, 21, 31, 1);
   static const Color darkAccent = Color.fromRGBO(126, 33, 58, 1);
   static const Color darkBorder = Color.fromRGBO(73, 40, 49, 1);
+  static const Color darkCard = Color.fromRGBO(44, 28, 33, 1);
 
   // Text colors
   static const Color textGray = Color(0xFF737373);
   static const Color textLightGray = Color.fromARGB(255, 161, 161, 161);
-  static const Color textDarkGray = Color.fromARGB(255, 88, 88, 88);
-  static const Color textMediumGray = Color.fromARGB(255, 98, 98, 98);
+  static const Color textDarkGray = Color.fromARGB(255, 60, 60, 60);
+  static const Color textMediumGray = Color.fromARGB(255, 120, 120, 120);
   static const Color textWhite = Colors.white;
   static const Color textOffWhite = Color.fromARGB(255, 233, 232, 232);
   static const Color iconLightGray = Color.fromARGB(255, 212, 212, 212);
@@ -47,16 +50,9 @@ class SponsorColors {
 
 /// Represents a sponsorship tier with price and display information
 class SponsorTier {
-  /// Display title of the tier (e.g., "Ant Tier")
   final String title;
-
-  /// Path to SVG asset for tier icon
   final String svgAssetPath;
-
-  /// Subtitle describing the tier
   final String subtitle;
-
-  /// Price in USD
   final int priceUSD;
 
   const SponsorTier({
@@ -66,7 +62,6 @@ class SponsorTier {
     required this.priceUSD,
   });
 
-  /// Available sponsorship tiers
   static const List<SponsorTier> availableTiers = [
     SponsorTier(
       title: "Ant Tier",
@@ -94,10 +89,7 @@ class SponsorTier {
     ),
   ];
 
-  /// Formatted price string (e.g., "$10")
   String get formattedPrice => '\$$priceUSD';
-
-  /// Full subtitle with price (e.g., "Join the Colony - $10")
   String get fullSubtitle => '$subtitle - $formattedPrice';
 }
 
@@ -105,10 +97,6 @@ class SponsorTier {
 // HELPER FUNCTIONS
 // ============================================================================
 
-/// Opens the BLT sponsorship page in an external browser.
-///
-/// Returns `true` if the URL was successfully launched, `false` otherwise.
-/// This includes both exceptions and cases where `launchUrl` returns `false`.
 Future<bool> openBltSupport() async {
   try {
     final uri = Uri.parse(kBltSupportUrl);
@@ -116,13 +104,9 @@ Future<bool> openBltSupport() async {
       uri,
       mode: LaunchMode.externalApplication,
     );
-
     if (!launched) {
-      debugPrint(
-        'Failed to launch $kBltSupportUrl: launchUrl returned false',
-      );
+      debugPrint('Failed to launch $kBltSupportUrl: launchUrl returned false');
     }
-
     return launched;
   } catch (e) {
     debugPrint('Error launching $kBltSupportUrl: $e');
@@ -134,7 +118,6 @@ Future<bool> openBltSupport() async {
 // MAIN PAGE
 // ============================================================================
 
-/// Page for displaying sponsorship tiers and handling tier selection
 class SponsorPage extends StatefulWidget {
   const SponsorPage({super.key});
 
@@ -143,65 +126,63 @@ class SponsorPage extends StatefulWidget {
 }
 
 class _SponsorPageState extends State<SponsorPage> {
-  /// Index of currently selected tier, null if no tier is selected
   int? _selectedTierIndex;
 
-  /// Whether a tier has been selected
   bool get _hasSelectedTier => _selectedTierIndex != null;
 
-  /// Select a tier by index
   void _selectTier(int index) {
     setState(() {
       _selectedTierIndex = index;
     });
   }
 
-  /// Deselect the currently selected tier
   void _deselectTier() {
     setState(() {
       _selectedTierIndex = null;
     });
   }
 
-  /// Handle sponsor button press - validates selection and opens URL
   Future<void> _handleSponsorButtonPressed(BuildContext context) async {
-    // Validate tier selection before proceeding
     if (!_hasSelectedTier) {
       _showNoTierSelectedError(context);
       return;
     }
-
-    // Attempt to open the sponsorship URL
     final success = await openBltSupport();
-
-    // Show error if URL launch failed and widget is still mounted
     if (!success && context.mounted) {
       _showUrlLaunchError(context);
     }
   }
 
-  /// Show error when no tier is selected
   void _showNoTierSelectedError(BuildContext context) {
     _showErrorSnackBar(context, kNoTierSelectedError);
   }
 
-  /// Show error when URL launch fails
   void _showUrlLaunchError(BuildContext context) {
     _showErrorSnackBar(context, kUrlLaunchError);
   }
 
-  /// Display an error message in a SnackBar
   void _showErrorSnackBar(BuildContext context, String message) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: SponsorColors.textWhite),
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline, color: SponsorColors.textWhite, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: SponsorColors.textWhite),
+              ),
+            ),
+          ],
         ),
         backgroundColor: isDarkMode
             ? SponsorColors.darkAccent
             : SponsorColors.primaryRed,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -213,15 +194,15 @@ class _SponsorPageState extends State<SponsorPage> {
     return Scaffold(
       backgroundColor: isDarkMode
           ? SponsorColors.darkBackground
-          : Theme.of(context).canvasColor,
+          : const Color(0xFFF8F8F8),
       appBar: _buildAppBar(isDarkMode),
       body: _buildBody(context, isDarkMode),
     );
   }
 
-  /// Build the app bar
   PreferredSizeWidget _buildAppBar(bool isDarkMode) {
     return AppBar(
+      elevation: 0,
       backgroundColor: isDarkMode
           ? SponsorColors.darkPrimary
           : SponsorColors.primaryRed,
@@ -232,79 +213,95 @@ class _SponsorPageState extends State<SponsorPage> {
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
-      title: const Text(
+      title: Text(
         "Sponsor BLT",
-        style: TextStyle(
-          color: SponsorColors.textWhite,
-          fontSize: 20,
+        style: GoogleFonts.ubuntu(
+          textStyle: const TextStyle(
+            color: SponsorColors.textWhite,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
         ),
       ),
+      centerTitle: true,
     );
   }
 
-  /// Build the page body
   Widget _buildBody(BuildContext context, bool isDarkMode) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            _buildIntroText(),
-            const SizedBox(height: 10),
+            _buildHeader(isDarkMode),
             _buildTierList(isDarkMode),
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
             _buildSponsorButton(context, isDarkMode),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  /// Build the page header
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
-      child: Text(
-        "Sponsor BLT",
-        style: GoogleFonts.ubuntu(
-          textStyle: const TextStyle(
-            color: SponsorColors.textGray,
-            fontSize: 25,
-            fontWeight: FontWeight.w500,
+  Widget _buildHeader(bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 20, 0, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: SponsorColors.primaryRed,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                "Choose a Tier",
+                style: GoogleFonts.ubuntu(
+                  textStyle: TextStyle(
+                    color: isDarkMode
+                        ? SponsorColors.textOffWhite
+                        : SponsorColors.textDarkGray,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            "Your sponsorship fuels groundbreaking open-source security projects.",
+            style: GoogleFonts.aBeeZee(
+              textStyle: TextStyle(
+                color: isDarkMode
+                    ? SponsorColors.textMediumGray
+                    : SponsorColors.textGray,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
 
-  /// Build the introductory text
-  Widget _buildIntroText() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-      child: Text(
-        "Join us in driving innovation and excellence in the tech community. "
-        "Your sponsorship helps fuel groundbreaking projects, ensuring we continue "
-        "to develop and share cutting-edge solutions with the world.",
-        style: GoogleFonts.aBeeZee(
-          textStyle: const TextStyle(
-            color: SponsorColors.textGray,
-            height: 1.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Build the list of sponsorship tiers
   Widget _buildTierList(bool isDarkMode) {
     return ListView.separated(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: SponsorTier.availableTiers.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final tier = SponsorTier.availableTiers[index];
         final isSelected = _selectedTierIndex == index;
@@ -319,40 +316,42 @@ class _SponsorPageState extends State<SponsorPage> {
     );
   }
 
-  /// Build the sponsor button
   Widget _buildSponsorButton(BuildContext context, bool isDarkMode) {
     return SizedBox(
       width: double.infinity,
+      height: 54,
       child: TextButton(
         onPressed: () => _handleSponsorButtonPressed(context),
         style: ButtonStyle(
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(12.0),
             ),
           ),
           backgroundColor: WidgetStateProperty.all(
             isDarkMode ? SponsorColors.darkAccent : SponsorColors.primaryRed,
           ),
-          padding: WidgetStateProperty.all(
-            const EdgeInsets.all(16.0),
+          overlayColor: WidgetStateProperty.all(
+            Colors.white.withOpacity(0.1),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.volunteer_activism,
+              Icons.volunteer_activism_rounded,
               color: SponsorColors.textWhite,
-              size: 28,
+              size: 22,
             ),
             const SizedBox(width: 8),
             Text(
-              "Sponsor",
+              "Sponsor Now",
               style: GoogleFonts.ubuntu(
                 textStyle: const TextStyle(
                   color: SponsorColors.textWhite,
-                  fontSize: 22,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
@@ -367,7 +366,6 @@ class _SponsorPageState extends State<SponsorPage> {
 // TILE WIDGETS
 // ============================================================================
 
-/// Widget for displaying an unselected sponsor tier
 class UnselectedSponsorTile extends StatelessWidget {
   const UnselectedSponsorTile({
     super.key,
@@ -384,46 +382,59 @@ class UnselectedSponsorTile extends StatelessWidget {
     return Container(
       width: size.width,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          width: 1.5,
-          color: isDarkMode ? SponsorColors.darkBorder : SponsorColors.primaryRed,
+        color: isDarkMode ? SponsorColors.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+        border: Border(
+          left: BorderSide(
+            width: 4,
+            color: SponsorColors.primaryRed.withOpacity(0.7),
+          ),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
             _buildTierIcon(size, isDarkMode),
-            const SizedBox(width: 10),
+            const SizedBox(width: 14),
             _buildTierInfo(isDarkMode),
+            _buildPriceBadge(isDarkMode),
           ],
         ),
       ),
     );
   }
 
-  /// Build the tier icon
   Widget _buildTierIcon(Size size, bool isDarkMode) {
-    return SizedBox(
-      width: size.width * 0.12,
-      height: size.width * 0.12,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: SvgPicture.asset(
-          tier.svgAssetPath,
-          colorFilter: isDarkMode
-              ? const ColorFilter.mode(
-                  SponsorColors.iconLightGray,
-                  BlendMode.srcIn,
-                )
-              : null,
+    return Container(
+      width: size.width * 0.11,
+      height: size.width * 0.11,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? SponsorColors.darkAccent.withOpacity(0.3)
+            : SponsorColors.primaryRed.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SvgPicture.asset(
+        tier.svgAssetPath,
+        colorFilter: ColorFilter.mode(
+          isDarkMode ? SponsorColors.iconLightGray : SponsorColors.primaryRed,
+          BlendMode.srcIn,
         ),
       ),
     );
   }
 
-  /// Build the tier information text
   Widget _buildTierInfo(bool isDarkMode) {
     return Expanded(
       child: Column(
@@ -434,21 +445,22 @@ class UnselectedSponsorTile extends StatelessWidget {
             style: GoogleFonts.ubuntu(
               textStyle: TextStyle(
                 color: isDarkMode
-                    ? SponsorColors.textLightGray
+                    ? SponsorColors.textOffWhite
                     : SponsorColors.textDarkGray,
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
+          const SizedBox(height: 2),
           Text(
-            tier.fullSubtitle,
+            tier.subtitle,
             style: GoogleFonts.ubuntu(
               textStyle: TextStyle(
                 color: isDarkMode
                     ? SponsorColors.textMediumGray
-                    : SponsorColors.textLightGray,
-                fontSize: 16,
+                    : SponsorColors.textGray,
+                fontSize: 12,
               ),
             ),
           ),
@@ -456,9 +468,32 @@ class UnselectedSponsorTile extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildPriceBadge(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? SponsorColors.darkAccent.withOpacity(0.4)
+            : SponsorColors.primaryRed.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        tier.formattedPrice,
+        style: GoogleFonts.ubuntu(
+          textStyle: TextStyle(
+            color: isDarkMode
+                ? SponsorColors.textLightGray
+                : SponsorColors.primaryRed,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-/// Widget for displaying a selected sponsor tier
 class SelectedSponsorTile extends StatelessWidget {
   const SelectedSponsorTile({
     super.key,
@@ -475,43 +510,57 @@ class SelectedSponsorTile extends StatelessWidget {
     return Container(
       width: size.width,
       decoration: BoxDecoration(
-        color: isDarkMode ? SponsorColors.darkPrimary : SponsorColors.primaryRed,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [SponsorColors.darkAccent, SponsorColors.darkPrimary]
+              : [SponsorColors.primaryRed, SponsorColors.primaryRedDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: SponsorColors.primaryRed.withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildTierIcon(size),
-            const SizedBox(width: 10),
+            const SizedBox(width: 14),
             Expanded(child: _buildTierInfo()),
-            _buildCheckmark(isDarkMode),
+            _buildPriceBadge(),
+            const SizedBox(width: 10),
+            _buildCheckmark(),
           ],
         ),
       ),
     );
   }
 
-  /// Build the tier icon
   Widget _buildTierIcon(Size size) {
-    return SizedBox(
-      width: size.width * 0.12,
-      height: size.width * 0.12,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: SvgPicture.asset(
-          tier.svgAssetPath,
-          colorFilter: const ColorFilter.mode(
-            SponsorColors.textWhite,
-            BlendMode.srcIn,
-          ),
+    return Container(
+      width: size.width * 0.11,
+      height: size.width * 0.11,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SvgPicture.asset(
+        tier.svgAssetPath,
+        colorFilter: const ColorFilter.mode(
+          SponsorColors.textWhite,
+          BlendMode.srcIn,
         ),
       ),
     );
   }
 
-  /// Build the tier information text
   Widget _buildTierInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,17 +570,18 @@ class SelectedSponsorTile extends StatelessWidget {
           style: GoogleFonts.ubuntu(
             textStyle: const TextStyle(
               color: SponsorColors.textWhite,
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
+        const SizedBox(height: 2),
         Text(
-          tier.fullSubtitle,
+          tier.subtitle,
           style: GoogleFonts.ubuntu(
             textStyle: const TextStyle(
               color: SponsorColors.textOffWhite,
-              fontSize: 16,
+              fontSize: 12,
             ),
           ),
         ),
@@ -539,12 +589,31 @@ class SelectedSponsorTile extends StatelessWidget {
     );
   }
 
-  /// Build the checkmark icon
-  Widget _buildCheckmark(bool isDarkMode) {
-    return Icon(
-      Icons.verified,
-      color: isDarkMode ? SponsorColors.textLightGray : SponsorColors.textWhite,
-      size: 30,
+  Widget _buildPriceBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        tier.formattedPrice,
+        style: GoogleFonts.ubuntu(
+          textStyle: const TextStyle(
+            color: SponsorColors.textWhite,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckmark(  ) {
+    return const Icon(
+      Icons.check_circle_rounded,
+      color: SponsorColors.textWhite,
+      size: 24,
     );
   }
 }
